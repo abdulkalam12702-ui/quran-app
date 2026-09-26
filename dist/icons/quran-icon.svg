@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b1329" />
+      <stop offset="50%" stop-color="#070b14" />
+      <stop offset="100%" stop-color="#030712" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24" />
+      <stop offset="50%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="12" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background rounded rect -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+  <rect width="504" height="504" x="4" y="4" rx="108" fill="none" stroke="url(#cyanGrad)" stroke-width="3" stroke-opacity="0.25" />
+
+  <!-- Subtle Islamic 8-point geometric background glow -->
+  <g opacity="0.08" stroke="#38bdf8" stroke-width="2" fill="none" transform="translate(256, 256) scale(1.6)">
+    <rect x="-70" y="-70" width="140" height="140" rx="10" />
+    <rect x="-70" y="-70" width="140" height="140" rx="10" transform="rotate(45)" />
+    <circle r="90" />
+  </g>
+
+  <!-- Quran Rehal / Open Holy Book Emblem -->
+  <g transform="translate(256, 250)" filter="url(#glow)">
+    <!-- Right Page -->
+    <path d="M 0,-60 C 45,-90 120,-85 170,-45 C 170,40 160,110 0,90 Z" 
+          fill="url(#cyanGrad)" opacity="0.9" />
+    <!-- Left Page -->
+    <path d="M 0,-60 C -45,-90 -120,-85 -170,-45 C -170,40 -160,110 0,90 Z" 
+          fill="url(#goldGrad)" opacity="0.95" />
+    
+    <!-- Central Spine / Binding Light -->
+    <path d="M -4,-62 L 4,-62 L 4,94 L -4,94 Z" fill="#ffffff" opacity="0.8" />
+
+    <!-- Quran Verses Lines on Left Page -->
+    <path d="M -40,-35 C -75,-45 -115,-40 -135,-25" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" opacity="0.75" fill="none" />
+    <path d="M -40,-5 C -80,-15 -115,-10 -135,5" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" opacity="0.75" fill="none" />
+    <path d="M -40,25 C -75,15 -115,20 -135,35" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" opacity="0.75" fill="none" />
+    <path d="M -40,55 C -75,45 -110,50 -125,60" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" opacity="0.6" fill="none" />
+
+    <!-- Quran Verses Lines on Right Page -->
+    <path d="M 40,-35 C 75,-45 115,-40 135,-25" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" opacity="0.75" fill="none" />
+    <path d="M 40,-5 C 80,-15 115,-10 135,5" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" opacity="0.75" fill="none" />
+    <path d="M 40,25 C 75,15 115,20 135,35" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" opacity="0.75" fill="none" />
+    <path d="M 40,55 C 75,45 110,50 125,60" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round" opacity="0.6" fill="none" />
+  </g>
+
+  <!-- Audio Wave Ripple Arc -->
+  <path d="M 190,130 C 230,105 282,105 322,130" fill="none" stroke="#38bdf8" stroke-width="5" stroke-linecap="round" opacity="0.85" />
+  <path d="M 160,100 C 220,65 292,65 352,100" fill="none" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" opacity="0.5" />
+  <path d="M 130,70 C 210,25 302,25 382,70" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" opacity="0.3" />
+
+  <!-- Rehal Stand Base -->
+  <path d="M -80,95 L -120,150 L -90,155 L -60,110 L 0,130 L 60,110 L 90,155 L 120,150 L 80,95 Z" 
+        fill="#1e293b" stroke="#334155" stroke-width="2" transform="translate(256, 250)" />
+</svg>

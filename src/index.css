@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --safe-bottom: env(safe-area-inset-bottom, 16px);
+  --safe-top: env(safe-area-inset-top, 16px);
+  --app-bg: #070b13;
+  --card-bg: #0f172a;
+  --accent-color: #38bdf8;
+}
+
+[data-theme="obsidian"] {
+  --app-bg: #000000;
+  --card-bg: #0a0a0c;
+  --accent-color: #60a5fa;
+}
+
+[data-theme="emerald"] {
+  --app-bg: #04100c;
+  --card-bg: #092019;
+  --accent-color: #34d399;
+}
+
+[data-theme="light"] {
+  --app-bg: #f8fafc;
+  --card-bg: #ffffff;
+  --accent-color: #0284c7;
+}
+
+/* Mobile Safe Areas and Viewport Locking */
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--app-bg);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Modern Range Slider for Volume and Seekbar */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]:focus {
+  outline: none;
+}
+
+/* Chrome, Safari, Edge */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.8), 0 2px 4px rgba(0, 0, 0, 0.4);
+  margin-top: -6px;
+  transition: transform 0.15s ease;
+}
+
+input[type="range"]:active::-webkit-slider-thumb {
+  transform: scale(1.25);
+}
+
+/* Firefox */
+input[type="range"]::-moz-range-thumb {
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: none;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.8), 0 2px 4px rgba(0, 0, 0, 0.4);
+  transition: transform 0.15s ease;
+}
+
+input[type="range"]:active::-moz-range-thumb {
+  transform: scale(1.25);
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 9999px;
+}
+
+/* Glassmorphism helpers */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-nav {
+  background: rgba(7, 11, 19, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Arabic typography scaling classes */
+.arabic-normal {
+  font-family: 'Amiri', 'Scheherazade New', serif;
+  font-size: 1.35rem;
+  line-height: 1.9;
+}
+
+.arabic-large {
+  font-family: 'Amiri', 'Scheherazade New', serif;
+  font-size: 1.7rem;
+  line-height: 2.1;
+}
+
+.arabic-xl {
+  font-family: 'Amiri', 'Scheherazade New', serif;
+  font-size: 2.15rem;
+  line-height: 2.4;
+}
+
+/* Subtle Shimmer for loading states */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.shimmer-effect {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-effect::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+  animation: shimmer 1.8s infinite;
+}
