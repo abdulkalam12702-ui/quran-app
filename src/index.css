@@ -2,40 +2,118 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+:root, [data-theme="navy"] {
   --safe-bottom: env(safe-area-inset-bottom, 16px);
   --safe-top: env(safe-area-inset-top, 16px);
-  --app-bg: #070b13;
-  --card-bg: #0f172a;
-  --accent-color: #38bdf8;
+  --theme-bg: #070b13;
+  --theme-card: #0f172a;
+  --theme-card-hover: #1e293b;
+  --theme-surface: #162035;
+  --theme-border: #1e293b;
+  --theme-border-light: rgba(255, 255, 255, 0.08);
+  --theme-text-primary: #f8fafc;
+  --theme-text-secondary: #94a3b8;
+  --theme-text-muted: #64748b;
+  --theme-accent: #38bdf8;
+  --theme-accent-bg: rgba(56, 189, 248, 0.12);
+  --theme-nav: rgba(7, 11, 19, 0.94);
+  --theme-input-bg: #0f172a;
+  --theme-calligraphy: #fde047;
+  --theme-card-active: rgba(56, 189, 248, 0.08);
+  --theme-ring: rgba(56, 189, 248, 0.35);
+  --theme-badge-bg: #1e293b;
+  --theme-badge-text: #38bdf8;
+  --theme-scrollbar: rgba(255, 255, 255, 0.15);
+  --app-bg: var(--theme-bg);
+  --card-bg: var(--theme-card);
+  --accent-color: var(--theme-accent);
 }
 
 [data-theme="obsidian"] {
-  --app-bg: #000000;
-  --card-bg: #0a0a0c;
-  --accent-color: #60a5fa;
+  --theme-bg: #000000;
+  --theme-card: #09090b;
+  --theme-card-hover: #141417;
+  --theme-surface: #18181b;
+  --theme-border: #27272a;
+  --theme-border-light: rgba(255, 255, 255, 0.12);
+  --theme-text-primary: #ffffff;
+  --theme-text-secondary: #a1a1aa;
+  --theme-text-muted: #71717a;
+  --theme-accent: #38bdf8;
+  --theme-accent-bg: rgba(56, 189, 248, 0.15);
+  --theme-nav: rgba(0, 0, 0, 0.96);
+  --theme-input-bg: #09090b;
+  --theme-calligraphy: #fbbf24;
+  --theme-card-active: rgba(56, 189, 248, 0.1);
+  --theme-ring: rgba(56, 189, 248, 0.4);
+  --theme-badge-bg: #18181b;
+  --theme-badge-text: #60a5fa;
+  --theme-scrollbar: rgba(255, 255, 255, 0.2);
+  --app-bg: var(--theme-bg);
+  --card-bg: var(--theme-card);
+  --accent-color: var(--theme-accent);
 }
 
 [data-theme="emerald"] {
-  --app-bg: #04100c;
-  --card-bg: #092019;
-  --accent-color: #34d399;
+  --theme-bg: #03140e;
+  --theme-card: #062319;
+  --theme-card-hover: #0a3526;
+  --theme-surface: #0a3325;
+  --theme-border: #0f4835;
+  --theme-border-light: rgba(52, 211, 153, 0.18);
+  --theme-text-primary: #ecfdf5;
+  --theme-text-secondary: #a7f3d0;
+  --theme-text-muted: #6ee7b7;
+  --theme-accent: #10b981;
+  --theme-accent-bg: rgba(16, 185, 129, 0.18);
+  --theme-nav: rgba(3, 20, 14, 0.95);
+  --theme-input-bg: #062319;
+  --theme-calligraphy: #fef08a;
+  --theme-card-active: rgba(16, 185, 129, 0.12);
+  --theme-ring: rgba(16, 185, 129, 0.4);
+  --theme-badge-bg: #0a3325;
+  --theme-badge-text: #34d399;
+  --theme-scrollbar: rgba(52, 211, 153, 0.25);
+  --app-bg: var(--theme-bg);
+  --card-bg: var(--theme-card);
+  --accent-color: var(--theme-accent);
 }
 
 [data-theme="light"] {
-  --app-bg: #f8fafc;
-  --card-bg: #ffffff;
-  --accent-color: #0284c7;
+  --theme-bg: #f8fafc;
+  --theme-card: #ffffff;
+  --theme-card-hover: #f1f5f9;
+  --theme-surface: #f1f5f9;
+  --theme-border: #e2e8f0;
+  --theme-border-light: #cbd5e1;
+  --theme-text-primary: #0f172a;
+  --theme-text-secondary: #475569;
+  --theme-text-muted: #64748b;
+  --theme-accent: #0284c7;
+  --theme-accent-bg: rgba(2, 132, 199, 0.08);
+  --theme-nav: rgba(255, 255, 255, 0.96);
+  --theme-input-bg: #ffffff;
+  --theme-calligraphy: #b45309;
+  --theme-card-active: rgba(2, 132, 199, 0.06);
+  --theme-ring: rgba(2, 132, 199, 0.35);
+  --theme-badge-bg: #f1f5f9;
+  --theme-badge-text: #0284c7;
+  --theme-scrollbar: rgba(0, 0, 0, 0.15);
+  --app-bg: var(--theme-bg);
+  --card-bg: var(--theme-card);
+  --accent-color: var(--theme-accent);
 }
 
 /* Mobile Safe Areas and Viewport Locking */
 html, body {
   margin: 0;
   padding: 0;
-  background-color: var(--app-bg);
+  background-color: var(--theme-bg);
+  color: var(--theme-text-primary);
   -webkit-tap-highlight-color: transparent;
   user-select: none;
   -webkit-user-select: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Custom Scrollbars */
@@ -49,12 +127,12 @@ html, body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--theme-scrollbar);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--theme-accent);
 }
 
 /* Modern Range Slider for Volume and Seekbar */
@@ -106,45 +184,49 @@ input[type="range"]::-webkit-slider-runnable-track {
   border-radius: 9999px;
 }
 
+/* Explicit Search Input Styling - High Visibility */
+.search-input {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background-color: #0f172a !important;
+  caret-color: #38bdf8 !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+}
+
+.search-input::placeholder {
+  color: #94a3b8 !important;
+  -webkit-text-fill-color: #94a3b8 !important;
+  opacity: 1 !important;
+}
+
+.search-input:focus {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background-color: #0f172a !important;
+  border-color: #38bdf8 !important;
+}
+
 /* Glassmorphism helpers */
 .glass-panel {
-  background: rgba(15, 23, 42, 0.75);
+  background: var(--theme-card);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--theme-border);
 }
 
 .glass-nav {
-  background: rgba(7, 11, 19, 0.85);
+  background: var(--theme-nav);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--theme-border);
 }
 
 .glass-pill {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--theme-accent-bg);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Arabic typography scaling classes */
-.arabic-normal {
-  font-family: 'Amiri', 'Scheherazade New', serif;
-  font-size: 1.35rem;
-  line-height: 1.9;
-}
-
-.arabic-large {
-  font-family: 'Amiri', 'Scheherazade New', serif;
-  font-size: 1.7rem;
-  line-height: 2.1;
-}
-
-.arabic-xl {
-  font-family: 'Amiri', 'Scheherazade New', serif;
-  font-size: 2.15rem;
-  line-height: 2.4;
+  border: 1px solid var(--theme-border-light);
 }
 
 /* Subtle Shimmer for loading states */
@@ -167,4 +249,334 @@ input[type="range"]::-webkit-slider-runnable-track {
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
   animation: shimmer 1.8s infinite;
+}
+
+/* ========================================================================= */
+/* IMMERSIVE ANIMATED ENVIRONMENT KEYFRAMES (GPU ACCELERATED)                */
+/* ========================================================================= */
+
+/* Multi-speed horizontal cloud drifts */
+@keyframes cloudDriftSlowest {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes cloudDriftSlow {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes cloudDriftMid {
+  0% { transform: translate3d(-50%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes cloudDriftFast {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes cloudDriftReverse {
+  0% { transform: translate3d(-40%, 0, 0); }
+  100% { transform: translate3d(10%, 0, 0); }
+}
+
+@keyframes cloudOpacityBreath {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.65; }
+}
+
+.animate-cloud-slowest {
+  animation: cloudDriftSlowest 140s linear infinite;
+  will-change: transform;
+}
+
+.animate-cloud-slow {
+  animation: cloudDriftSlow 85s linear infinite;
+  will-change: transform;
+}
+
+.animate-cloud-mid {
+  animation: cloudDriftMid 55s linear infinite;
+  will-change: transform;
+}
+
+.animate-cloud-fast {
+  animation: cloudDriftFast 35s linear infinite;
+  will-change: transform;
+}
+
+.animate-cloud-reverse {
+  animation: cloudDriftReverse 70s linear infinite;
+  will-change: transform;
+}
+
+.animate-cloud-breath {
+  animation: cloudOpacityBreath 20s ease-in-out infinite;
+  will-change: opacity;
+}
+
+/* Subtle Mountain Layer Parallax (imperceptible, organic 3D breathing) */
+@keyframes parallaxFar {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-6px, -2px, 0) scale(1.01); }
+}
+
+@keyframes parallaxMid {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(12px, -3px, 0) scale(1.02); }
+}
+
+@keyframes parallaxNear {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-18px, -5px, 0) scale(1.03); }
+}
+
+.animate-parallax-far {
+  animation: parallaxFar 45s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-parallax-mid {
+  animation: parallaxMid 32s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-parallax-near {
+  animation: parallaxNear 22s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Subtle camera breathing zoom for base landscape */
+@keyframes subtleParallaxZoom {
+  0%, 100% { transform: scale(1) translate3d(0, 0, 0); }
+  50% { transform: scale(1.03) translate3d(0, -5px, 0); }
+}
+
+.animate-parallax-zoom {
+  animation: subtleParallaxZoom 28s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Rolling valley fog / mist waves */
+@keyframes fogDriftSlow {
+  0% { transform: translate3d(0, 0, 0); opacity: 0.35; }
+  50% { transform: translate3d(-18%, 2px, 0); opacity: 0.65; }
+  100% { transform: translate3d(0, 0, 0); opacity: 0.35; }
+}
+
+@keyframes fogDriftReverse {
+  0% { transform: translate3d(-20%, 0, 0); opacity: 0.4; }
+  50% { transform: translate3d(5%, -3px, 0); opacity: 0.6; }
+  100% { transform: translate3d(-20%, 0, 0); opacity: 0.4; }
+}
+
+@keyframes mistRise {
+  0%, 100% { transform: translate3d(0, 0, 0) scaleY(1); opacity: 0.3; }
+  50% { transform: translate3d(-10px, -8px, 0) scaleY(1.15); opacity: 0.55; }
+}
+
+.animate-fog {
+  animation: fogDriftSlow 32s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-fog-slow {
+  animation: fogDriftSlow 42s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-fog-reverse {
+  animation: fogDriftReverse 38s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-mist-rise {
+  animation: mistRise 18s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Multi-layer Ocean Waves */
+@keyframes waveOscillateFar {
+  0%, 100% { transform: translate3d(0, 0, 0) scaleY(1); }
+  50% { transform: translate3d(-25px, -3px, 0) scaleY(1.04); }
+}
+
+@keyframes waveOscillateMid {
+  0%, 100% { transform: translate3d(-30px, 0, 0) scaleY(1.02); }
+  50% { transform: translate3d(25px, -6px, 0) scaleY(0.97); }
+}
+
+@keyframes waveOscillateNear {
+  0%, 100% { transform: translate3d(0, 0, 0) scaleY(1); }
+  50% { transform: translate3d(-40px, -8px, 0) scaleY(1.08); }
+}
+
+@keyframes waveRollForward {
+  0% { transform: translate3d(0, 10px, 0) scale(0.98); opacity: 0.7; }
+  50% { transform: translate3d(0, 0, 0) scale(1.02); opacity: 0.95; }
+  100% { transform: translate3d(0, 10px, 0) scale(0.98); opacity: 0.7; }
+}
+
+@keyframes waveShimmer {
+  0%, 100% { opacity: 0.3; transform: translate3d(0, 0, 0) scaleX(1); }
+  50% { opacity: 0.65; transform: translate3d(18px, 0, 0) scaleX(1.08); }
+}
+
+.animate-wave-far {
+  animation: waveOscillateFar 14s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-wave-mid {
+  animation: waveOscillateMid 10s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-wave-near {
+  animation: waveOscillateNear 6.5s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-wave-roll {
+  animation: waveRollForward 8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-wave-shimmer {
+  animation: waveShimmer 7s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Backward compatibility for wave aliases */
+.animate-wave-1 { animation: waveOscillateFar 10s ease-in-out infinite; }
+.animate-wave-2 { animation: waveOscillateNear 7s ease-in-out infinite; }
+
+/* Tree & Foliage Wind Sway */
+@keyframes treeBreezeGentle {
+  0%, 100% { transform: rotate(0deg) translate3d(0, 0, 0); }
+  33% { transform: rotate(0.9deg) translate3d(2px, -1px, 0); }
+  66% { transform: rotate(-0.8deg) translate3d(-1px, 1px, 0); }
+}
+
+@keyframes treeBreezeMid {
+  0%, 100% { transform: rotate(0deg) translate3d(0, 0, 0); }
+  40% { transform: rotate(-1.4deg) translate3d(-3px, 1px, 0); }
+  75% { transform: rotate(1.2deg) translate3d(3px, -1px, 0); }
+}
+
+@keyframes leafFlutter {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(2.5deg) scale(1.02); }
+  75% { transform: rotate(-2deg) scale(0.98); }
+}
+
+.animate-tree-gentle {
+  transform-origin: bottom center;
+  animation: treeBreezeGentle 11s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-tree-mid {
+  transform-origin: bottom center;
+  animation: treeBreezeMid 8s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-tree-sway {
+  transform-origin: bottom center;
+  animation: treeBreezeGentle 9s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-leaf-flutter {
+  transform-origin: top left;
+  animation: leafFlutter 5s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* Forest God-Rays / Sunbeams breathing */
+@keyframes lightShaftBreathe {
+  0%, 100% { opacity: 0.18; transform: translate3d(0, 0, 0) scaleX(1); }
+  50% { opacity: 0.42; transform: translate3d(8px, 4px, 0) scaleX(1.05); }
+}
+
+.animate-light-shaft {
+  animation: lightShaftBreathe 13s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Sunset Sun Light Pulse */
+@keyframes sunAuraBreathe {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.12); opacity: 0.95; }
+}
+
+.animate-sun-pulse {
+  animation: sunAuraBreathe 11s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+/* Distant Serene Sheet Lightning */
+@keyframes distantSheetLightning {
+  0%, 94%, 98%, 100% { opacity: 0; }
+  95% { opacity: 0.22; }
+  96% { opacity: 0.04; }
+  97% { opacity: 0.16; }
+}
+
+.animate-distant-lightning {
+  animation: distantSheetLightning 26s ease-in-out infinite;
+  will-change: opacity;
+}
+
+/* Soft Star Twinkling */
+@keyframes starTwinkleSoft {
+  0%, 100% { opacity: 0.25; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+/* Floating light motes / pollen */
+@keyframes floatMote {
+  0% { transform: translate3d(0, 0, 0); opacity: 0; }
+  20% { opacity: 0.75; }
+  80% { opacity: 0.65; }
+  100% { transform: translate3d(28px, -80px, 0); opacity: 0; }
+}
+
+/* Firefly Flight and Glow */
+@keyframes fireflyFlight1 {
+  0% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(20px, -15px, 0); }
+  50% { transform: translate3d(35px, 8px, 0); }
+  75% { transform: translate3d(15px, 20px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes fireflyFlight2 {
+  0% { transform: translate3d(0, 0, 0); }
+  30% { transform: translate3d(-25px, 18px, 0); }
+  60% { transform: translate3d(-40px, -12px, 0); }
+  85% { transform: translate3d(-10px, -20px, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes fireflyGlow {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 0.95; transform: scale(1.3); }
+}
+
+.animate-firefly-1 {
+  animation: fireflyFlight1 16s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-firefly-2 {
+  animation: fireflyFlight2 20s ease-in-out infinite;
+  will-change: transform;
+}
+
+.animate-firefly-glow {
+  animation: fireflyGlow 4s ease-in-out infinite;
+  will-change: transform, opacity;
 }

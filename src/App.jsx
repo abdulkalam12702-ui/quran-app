@@ -51,7 +51,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col relative selection:bg-sky-500/30 selection:text-sky-200">
+    <div className="min-h-screen bg-theme-bg text-theme-primary flex flex-col relative selection:bg-theme-accent/30 selection:text-theme-accent transition-colors duration-200">
       {/* Offline Status Warning Bar */}
       {!isOnline && (
         <div className="bg-amber-600/90 text-white text-xs font-semibold px-4 py-1.5 flex items-center justify-center gap-2 sticky top-0 z-50 backdrop-blur-md">

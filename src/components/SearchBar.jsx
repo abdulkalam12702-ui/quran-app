@@ -4,7 +4,7 @@ import { Search, X } from 'lucide-react';
 export const SearchBar = ({ 
   value, 
   onChange, 
-  placeholder = "Search Surah, Arabic name, number...", 
+  placeholder = "Search Surah...", 
   autoFocus = false 
 }) => {
   return (
@@ -19,7 +19,15 @@ export const SearchBar = ({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         autoFocus={autoFocus}
-        className="w-full pl-10 pr-10 py-3 rounded-2xl bg-slate-900/80 border border-slate-800 text-slate-100 placeholder-slate-500 text-sm focus:outline-none focus:border-sky-500/70 focus:ring-2 focus:ring-sky-500/20 backdrop-blur-md transition-all shadow-inner"
+        autoComplete="off"
+        spellCheck="false"
+        style={{
+          color: '#ffffff',
+          backgroundColor: '#0f172a',
+          caretColor: '#38bdf8',
+          WebkitTextFillColor: '#ffffff',
+        }}
+        className="search-input w-full pl-10 pr-10 py-3 rounded-2xl bg-slate-900 border border-slate-700 text-white placeholder:text-slate-400 text-sm focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/25 transition-all shadow-sm select-text"
       />
 
       {value && (
@@ -27,7 +35,7 @@ export const SearchBar = ({
           type="button"
           onClick={() => onChange('')}
           aria-label="Clear search"
-          className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors"
+          className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>
@@ -35,3 +43,5 @@ export const SearchBar = ({
     </div>
   );
 };
+
+export default SearchBar;

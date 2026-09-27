@@ -7,8 +7,9 @@ const STORAGE_KEYS = {
   FAV_RECITERS: 'quran_fav_reciters',
   RECENTLY_PLAYED: 'quran_recently_played',
   THEME: 'quran_theme',
-  ARABIC_SIZE: 'quran_arabic_size',
   DEFAULT_RECITER: 'quran_default_reciter',
+  ENVIRONMENT_ID: 'quran_environment_id',
+  AUTO_BACKGROUND: 'quran_auto_background',
 };
 
 export const PreferencesProvider = ({ children }) => {
@@ -49,12 +50,17 @@ export const PreferencesProvider = ({ children }) => {
     return localStorage.getItem(STORAGE_KEYS.THEME) || 'navy';
   });
 
-  const [arabicSize, setArabicSize] = useState(() => {
-    return localStorage.getItem(STORAGE_KEYS.ARABIC_SIZE) || 'large';
-  });
-
   const [defaultReciterId, setDefaultReciterId] = useState(() => {
     return localStorage.getItem(STORAGE_KEYS.DEFAULT_RECITER) || 'mishary_alafasy';
+  });
+
+  // Environment & Auto Background
+  const [savedEnvironmentId, setSavedEnvironmentId] = useState(() => {
+    return localStorage.getItem(STORAGE_KEYS.ENVIRONMENT_ID) || 'mountains';
+  });
+
+  const [isAutoBackground, setIsAutoBackground] = useState(() => {
+    return localStorage.getItem(STORAGE_KEYS.AUTO_BACKGROUND) === 'true';
   });
 
   // Persist to localStorage
@@ -73,15 +79,24 @@ export const PreferencesProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.THEME, theme);
     document.documentElement.setAttribute('data-theme', theme);
+    if (theme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      document.documentElement.classList.add('dark');
+    }
   }, [theme]);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.ARABIC_SIZE, arabicSize);
-  }, [arabicSize]);
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.DEFAULT_RECITER, defaultReciterId);
   }, [defaultReciterId]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.ENVIRONMENT_ID, savedEnvironmentId);
+  }, [savedEnvironmentId]);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEYS.AUTO_BACKGROUND, String(isAutoBackground));
+  }, [isAutoBackground]);
 
   const toggleFavoriteSurah = (surahId) => {
     const id = Number(surahId);
@@ -134,10 +149,12 @@ export const PreferencesProvider = ({ children }) => {
         clearHistory,
         theme,
         setTheme,
-        arabicSize,
-        setArabicSize,
         defaultReciterId,
         setDefaultReciterId,
+        savedEnvironmentId,
+        setSavedEnvironmentId,
+        isAutoBackground,
+        setIsAutoBackground,
       }}
     >
       {children}

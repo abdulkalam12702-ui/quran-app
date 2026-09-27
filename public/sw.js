@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quran-app-v1';
+const CACHE_NAME = 'quran-app-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -9,12 +9,12 @@ const ASSETS_TO_CACHE = [
 ];
 
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE);
+      return cache.addAll(ASSETS_TO_CACHE).catch(() => {});
     })
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
@@ -27,35 +27,59 @@ self.addEventListener('activate', (event) => {
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
-  self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
-  // Pass through audio streaming directly so Range requests and streaming audio work smoothly
-  if (event.request.url.includes('.mp3') || event.request.url.includes('cdn.islamic.network') || event.request.url.includes('mp3quran.net')) {
+  const url = event.request.url;
+
+  // 1. Never intercept audio streaming requests (MP3s, CDNs)
+  if (url.includes('.mp3') || url.includes('cdn.islamic.network') || url.includes('mp3quran.net')) {
     return;
   }
 
+  // 2. In development mode (Vite client, src modules, hot reloads), bypass service worker completely
+  if (
+    url.includes('/@vite/') || 
+    url.includes('/src/') || 
+    url.includes('?t=') || 
+    url.includes('/@react-refresh')
+  ) {
+    return;
+  }
+
+  // 3. For navigation requests (loading index.html), use NETWORK FIRST, falling back to cache if offline
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          const clone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          return networkResponse;
+        })
+        .catch(() => {
+          return caches.match('/index.html');
+        })
+    );
+    return;
+  }
+
+  // 4. For static production assets (/assets/), cache with network fallback
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request).then((networkResponse) => {
-        // Cache static JS/CSS
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      return fetch(event.request).then((networkResponse) => {
         if (
           event.request.method === 'GET' &&
-          (event.request.url.includes('/assets/') || event.request.url.includes('fonts.googleapis.com'))
+          (url.includes('/assets/') || url.includes('fonts.googleapis.com'))
         ) {
           const clone = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, clone);
-          });
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
         }
         return networkResponse;
-      }).catch(() => {
-        if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
-        }
       });
     })
   );

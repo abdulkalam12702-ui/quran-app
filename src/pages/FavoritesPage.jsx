@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, BookOpen, Mic2, Sparkles, HeartCrack } from 'lucide-react';
+import { Heart, BookOpen, Mic2, HeartCrack } from 'lucide-react';
 import { usePreferences } from '../context/PreferencesContext';
 import { useAudio } from '../context/AudioContext';
 import { getSurahById } from '../data/surahsData';
@@ -9,7 +9,7 @@ import { ReciterCard } from '../components/ReciterCard';
 
 export const FavoritesPage = ({ onNavigate }) => {
   const { favoriteSurahs, favoriteReciters } = usePreferences();
-  const { playSurah, currentReciterId } = useAudio();
+  const { currentReciterId, selectSurah } = useAudio();
   const [activeTab, setActiveTab] = useState('surahs'); // 'surahs' or 'reciters'
 
   const favoriteSurahObjects = favoriteSurahs.map((id) => getSurahById(id)).filter(Boolean);
@@ -21,14 +21,14 @@ export const FavoritesPage = ({ onNavigate }) => {
       <header className="flex flex-col gap-1 pt-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-rose-500/10 text-rose-500">
+            <div className="p-2 rounded-xl bg-rose-500/10 text-rose-500 border border-rose-500/20">
               <Heart className="w-5 h-5 fill-rose-500" />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-extrabold text-white tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-extrabold text-theme-primary tracking-tight">
                 My Favorites
               </h1>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-theme-muted">
                 Your saved Surahs & Reciters
               </p>
             </div>
@@ -37,14 +37,14 @@ export const FavoritesPage = ({ onNavigate }) => {
       </header>
 
       {/* SEGMENTED TAB SWITCHER */}
-      <div className="grid grid-cols-2 p-1 rounded-2xl bg-slate-900/80 border border-slate-800">
+      <div className="grid grid-cols-2 p-1 rounded-2xl bg-theme-card border border-theme-border shadow-sm">
         <button
           type="button"
           onClick={() => setActiveTab('surahs')}
-          className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all ${
+          className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'surahs'
-              ? 'bg-gradient-to-r from-sky-500 to-indigo-600 text-white shadow-md'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-theme-accent text-slate-950 font-bold shadow-md shadow-theme-accent/20'
+              : 'text-theme-muted hover:text-theme-primary'
           }`}
         >
           <BookOpen className="w-4 h-4" />
@@ -54,10 +54,10 @@ export const FavoritesPage = ({ onNavigate }) => {
         <button
           type="button"
           onClick={() => setActiveTab('reciters')}
-          className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all ${
+          className={`flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'reciters'
-              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md'
-              : 'text-slate-400 hover:text-slate-200'
+              ? 'bg-theme-accent text-slate-950 font-bold shadow-md shadow-theme-accent/20'
+              : 'text-theme-muted hover:text-theme-primary'
           }`}
         >
           <Mic2 className="w-4 h-4" />
@@ -73,22 +73,21 @@ export const FavoritesPage = ({ onNavigate }) => {
               <SurahCard
                 key={surah.id}
                 surah={surah}
-                onPlay={(id) => playSurah(id)}
               />
             ))
           ) : (
-            <div className="py-16 flex flex-col items-center justify-center text-center p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 my-4">
-              <div className="w-14 h-14 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center mb-3">
+            <div className="py-16 flex flex-col items-center justify-center text-center p-6 rounded-3xl bg-theme-card border border-theme-border my-4 shadow-sm">
+              <div className="w-14 h-14 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center mb-3 border border-rose-500/20">
                 <HeartCrack className="w-7 h-7" />
               </div>
-              <h3 className="text-base font-bold text-slate-200">No Favorite Surahs Yet</h3>
-              <p className="text-xs text-slate-400 mt-1 max-w-xs">
+              <h3 className="text-base font-bold text-theme-primary">No Favorite Surahs Yet</h3>
+              <p className="text-xs text-theme-muted mt-1 max-w-xs">
                 Tap the heart icon on any Surah card to save it here for quick listening anytime.
               </p>
               <button
                 type="button"
                 onClick={() => onNavigate('quran')}
-                className="mt-4 px-4 py-2 rounded-xl bg-sky-500 text-slate-950 hover:bg-sky-400 text-xs font-bold shadow-glow transition-all"
+                className="mt-4 px-4 py-2 rounded-xl bg-theme-accent text-slate-950 hover:opacity-90 text-xs font-bold shadow-md transition-all cursor-pointer"
               >
                 Browse Surahs
               </button>
@@ -106,22 +105,22 @@ export const FavoritesPage = ({ onNavigate }) => {
                 key={reciter.id}
                 reciter={reciter}
                 isSelected={currentReciterId === reciter.id}
-                onSelect={(r) => playSurah(1, r.id)}
+                onSelect={(r) => selectSurah(1, r.id)}
               />
             ))
           ) : (
-            <div className="py-16 flex flex-col items-center justify-center text-center p-6 rounded-3xl bg-slate-900/40 border border-slate-800/80 my-4">
-              <div className="w-14 h-14 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center mb-3">
+            <div className="py-16 flex flex-col items-center justify-center text-center p-6 rounded-3xl bg-theme-card border border-theme-border my-4 shadow-sm">
+              <div className="w-14 h-14 rounded-2xl bg-rose-500/10 text-rose-500 flex items-center justify-center mb-3 border border-rose-500/20">
                 <HeartCrack className="w-7 h-7" />
               </div>
-              <h3 className="text-base font-bold text-slate-200">No Favorite Reciters Yet</h3>
-              <p className="text-xs text-slate-400 mt-1 max-w-xs">
+              <h3 className="text-base font-bold text-theme-primary">No Favorite Reciters Yet</h3>
+              <p className="text-xs text-theme-muted mt-1 max-w-xs">
                 Tap the heart on your preferred Qaris to easily find and listen to them.
               </p>
               <button
                 type="button"
                 onClick={() => onNavigate('reciters')}
-                className="mt-4 px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-500 text-xs font-bold shadow-md transition-all"
+                className="mt-4 px-4 py-2 rounded-xl bg-theme-accent text-slate-950 hover:opacity-90 text-xs font-bold shadow-md transition-all cursor-pointer"
               >
                 Browse Reciters
               </button>

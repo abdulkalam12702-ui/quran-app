@@ -208,6 +208,122 @@ class AmbientSoundEngine {
     this.nodes.push(source, filter1, streamGain);
   }
 
+  playNight() {
+    this.stopCurrent();
+
+    // 1. Soft nocturnal breeze (pink noise through high-Q bandpass)
+    const noiseBuffer = this.createNoiseBuffer('pink');
+    const source = this.audioCtx.createBufferSource();
+    source.buffer = noiseBuffer;
+    source.loop = true;
+
+    const breezeFilter = this.audioCtx.createBiquadFilter();
+    breezeFilter.type = 'bandpass';
+    breezeFilter.frequency.value = 420;
+    breezeFilter.Q.value = 2.5;
+
+    const breezeGain = this.audioCtx.createGain();
+    breezeGain.gain.value = 0.16;
+
+    source.connect(breezeFilter);
+    breezeFilter.connect(breezeGain);
+    breezeGain.connect(this.masterGain);
+    source.start();
+    this.nodes.push(source, breezeFilter, breezeGain);
+
+    // 2. Warm harmonic celestial drone
+    const droneOsc = this.audioCtx.createOscillator();
+    droneOsc.type = 'sine';
+    droneOsc.frequency.value = 130.81; // C3
+    const droneGain = this.audioCtx.createGain();
+    droneGain.gain.value = 0.04;
+    droneOsc.connect(droneGain);
+    droneGain.connect(this.masterGain);
+    droneOsc.start();
+    this.nodes.push(droneOsc, droneGain);
+
+    // 3. Delicate rhythmic crickets (high frequency pulsed chirp)
+    const cricketSource = this.audioCtx.createBufferSource();
+    cricketSource.buffer = noiseBuffer;
+    cricketSource.loop = true;
+
+    const cricketFilter = this.audioCtx.createBiquadFilter();
+    cricketFilter.type = 'bandpass';
+    cricketFilter.frequency.value = 4600;
+    cricketFilter.Q.value = 9.0;
+
+    const cricketGain = this.audioCtx.createGain();
+    cricketGain.gain.value = 0.0;
+
+    cricketSource.connect(cricketFilter);
+    cricketFilter.connect(cricketGain);
+    cricketGain.connect(this.masterGain);
+    cricketSource.start();
+    this.nodes.push(cricketSource, cricketFilter, cricketGain);
+
+    // Rhythmic chirp pulse cycle (chirp-chirp-chirp... pause)
+    let chirpCycle = 0;
+    this.lfoInterval = setInterval(() => {
+      if (!this.audioCtx || this.audioCtx.state !== 'running') return;
+      chirpCycle = (chirpCycle + 1) % 18;
+      const isChirping = [1, 2, 3, 5, 6, 7].includes(chirpCycle);
+      const targetGain = isChirping ? 0.075 : 0.002;
+      cricketGain.gain.setTargetAtTime(targetGain, this.audioCtx.currentTime, 0.025);
+    }, 110);
+  }
+
+  playFire() {
+    this.stopCurrent();
+
+    // 1. Warm low rumble of combustion (brown noise through lowpass)
+    const noiseBuffer = this.createNoiseBuffer('brown');
+    const rumbleSource = this.audioCtx.createBufferSource();
+    rumbleSource.buffer = noiseBuffer;
+    rumbleSource.loop = true;
+
+    const rumbleFilter = this.audioCtx.createBiquadFilter();
+    rumbleFilter.type = 'lowpass';
+    rumbleFilter.frequency.value = 260;
+
+    const rumbleGain = this.audioCtx.createGain();
+    rumbleGain.gain.value = 0.22;
+
+    rumbleSource.connect(rumbleFilter);
+    rumbleFilter.connect(rumbleGain);
+    rumbleGain.connect(this.masterGain);
+    rumbleSource.start();
+    this.nodes.push(rumbleSource, rumbleFilter, rumbleGain);
+
+    // 2. High-frequency crackles, pops, and wood snapping
+    const crackleSource = this.audioCtx.createBufferSource();
+    crackleSource.buffer = this.createNoiseBuffer('pink');
+    crackleSource.loop = true;
+
+    const crackleFilter = this.audioCtx.createBiquadFilter();
+    crackleFilter.type = 'bandpass';
+    crackleFilter.frequency.value = 3200;
+    crackleFilter.Q.value = 4.5;
+
+    const crackleGain = this.audioCtx.createGain();
+    crackleGain.gain.value = 0.02;
+
+    crackleSource.connect(crackleFilter);
+    crackleFilter.connect(crackleGain);
+    crackleGain.connect(this.masterGain);
+    crackleSource.start();
+    this.nodes.push(crackleSource, crackleFilter, crackleGain);
+
+    // Random impulsive wood snaps and crackles
+    this.lfoInterval = setInterval(() => {
+      if (!this.audioCtx || this.audioCtx.state !== 'running') return;
+      const isPop = Math.random() < 0.35;
+      const popGain = isPop ? 0.12 + Math.random() * 0.22 : 0.01;
+      const freq = 2000 + Math.random() * 2500;
+      crackleFilter.frequency.setValueAtTime(freq, this.audioCtx.currentTime);
+      crackleGain.gain.setTargetAtTime(popGain, this.audioCtx.currentTime, 0.015);
+    }, 90);
+  }
+
   playCalmPad() {
     this.stopCurrent();
     // Warm harmonic soft drone / peaceful ambient pad (C & G harmonic chord)
@@ -248,6 +364,12 @@ class AmbientSoundEngine {
         break;
       case 'stream':
         this.playStream();
+        break;
+      case 'fire':
+        this.playFire();
+        break;
+      case 'night':
+        this.playNight();
         break;
       case 'pad':
         this.playCalmPad();

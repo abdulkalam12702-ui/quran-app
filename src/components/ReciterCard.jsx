@@ -20,13 +20,13 @@ export const ReciterCard = ({ reciter, onSelect, isSelected = false }) => {
       onClick={() => onSelect(reciter)}
       className={`group relative rounded-2xl p-4 transition-all duration-300 cursor-pointer flex items-center justify-between border ${
         isSelected || isCurrentActive
-          ? 'bg-slate-900/90 border-sky-500/60 shadow-[0_4px_25px_rgba(56,189,248,0.15)] ring-1 ring-sky-500/30'
-          : 'bg-slate-900/50 hover:bg-slate-900/80 border-slate-800/80 hover:border-slate-700/80'
+          ? 'bg-theme-card border-theme-accent/70 shadow-[0_4px_25px_var(--theme-ring)] ring-1 ring-theme-accent/40'
+          : 'bg-theme-card/80 hover:bg-theme-card-hover border-theme-border hover:border-theme-border-light shadow-sm'
       }`}
     >
       {/* Left column: Reciter Avatar & Info */}
       <div className="flex items-center gap-3.5 min-w-0">
-        <div className="relative w-12 h-12 rounded-2xl overflow-hidden flex-shrink-0 border border-slate-700 shadow-md">
+        <div className="relative w-12 h-12 rounded-2xl overflow-hidden flex-shrink-0 border border-theme-border shadow-md">
           <img
             src={reciter.avatar}
             alt={reciter.name_en}
@@ -40,17 +40,17 @@ export const ReciterCard = ({ reciter, onSelect, isSelected = false }) => {
         <div className="flex flex-col min-w-0">
           <div className="flex items-center gap-2">
             <h3 className={`text-sm sm:text-base font-bold truncate transition-colors ${
-              isSelected || isCurrentActive ? 'text-sky-300' : 'text-slate-100 group-hover:text-white'
+              isSelected || isCurrentActive ? 'text-theme-accent' : 'text-theme-primary group-hover:text-theme-accent'
             }`}>
               {reciter.name_en}
             </h3>
             {isCurrentActive && (
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-sky-500/20 text-sky-400 border border-sky-500/30">
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-theme-accent/20 text-theme-accent border border-theme-accent/30">
                 ACTIVE
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
+          <div className="flex items-center gap-2 text-xs text-theme-muted mt-0.5">
             <span className="truncate">{reciter.style}</span>
             <span>&bull;</span>
             <span>{reciter.totalSurahs} Surahs</span>
@@ -60,7 +60,10 @@ export const ReciterCard = ({ reciter, onSelect, isSelected = false }) => {
 
       {/* Right Column: Arabic Name, Favorite, Select indicator */}
       <div className="flex items-center gap-2 flex-shrink-0 ml-3">
-        <span className="hidden sm:inline font-arabic text-amber-300/90 text-sm font-semibold">
+        <span 
+          className="hidden sm:inline font-arabic text-sm font-semibold"
+          style={{ color: 'var(--theme-calligraphy)' }}
+        >
           {reciter.name_ar}
         </span>
 
@@ -68,10 +71,10 @@ export const ReciterCard = ({ reciter, onSelect, isSelected = false }) => {
           type="button"
           onClick={handleFavoriteClick}
           aria-label={isFav ? "Remove from favorite reciters" : "Favorite reciter"}
-          className={`p-2 rounded-xl transition-all ${
+          className={`p-2 rounded-xl transition-all cursor-pointer ${
             isFav
               ? 'text-rose-500 hover:text-rose-400'
-              : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/50'
+              : 'text-theme-muted hover:text-theme-primary hover:bg-theme-surface'
           }`}
         >
           <Heart className={`w-4 h-4 ${isFav ? 'fill-rose-500' : ''}`} />
@@ -80,8 +83,8 @@ export const ReciterCard = ({ reciter, onSelect, isSelected = false }) => {
         <div
           className={`w-9 h-9 rounded-xl flex items-center justify-center transition-all ${
             isSelected || isCurrentActive
-              ? 'bg-sky-500 text-slate-950 shadow-md'
-              : 'bg-slate-800 text-slate-300 group-hover:bg-slate-700 group-hover:text-white'
+              ? 'bg-theme-accent text-slate-950 font-bold shadow-md shadow-theme-accent/20'
+              : 'bg-theme-surface text-theme-secondary group-hover:bg-theme-accent group-hover:text-slate-950 border border-theme-border'
           }`}
         >
           {isSelected || isCurrentActive ? (

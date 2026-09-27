@@ -21,19 +21,43 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Scheherazade+New:wght@400;600;700&display=swap" rel="stylesheet">
 
+    <script>
+      (function() {
+        try {
+          var t = localStorage.getItem('quran_theme') || 'navy';
+          document.documentElement.setAttribute('data-theme', t);
+          if (t === 'light') {
+            document.documentElement.classList.remove('dark');
+          } else {
+            document.documentElement.classList.add('dark');
+          }
+        } catch (e) {}
+      })();
+    </script>
     <title>Quran - Audio & Recitations</title>
   </head>
-  <body class="bg-[#070b13] text-slate-100 antialiased selection:bg-sky-500/30 selection:text-sky-200 overflow-x-hidden">
+  <body style="background-color: #070b13; color: #f8fafc;" class="bg-theme-bg text-theme-primary antialiased selection:bg-sky-500/30 selection:text-sky-200 overflow-x-hidden transition-colors duration-200">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <script>
-      // Register Service Worker for PWA
+      // Manage Service Worker
       if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js')
-            .then(reg => console.log('PWA Service Worker registered:', reg.scope))
-            .catch(err => console.log('Service Worker registration failed:', err));
-        });
+        var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        if (isLocal) {
+          // In development on localhost, unregister lingering service workers so hot reload is never cached
+          navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for (var i = 0; i < registrations.length; i++) {
+              registrations[i].unregister();
+            }
+          });
+        } else {
+          // In production, register PWA Service Worker
+          window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js')
+              .then(function(reg) { console.log('PWA Service Worker registered:', reg.scope); })
+              .catch(function(err) { console.log('Service Worker registration failed:', err); });
+          });
+        }
       }
     </script>
   </body>

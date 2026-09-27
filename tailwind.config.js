@@ -8,6 +8,21 @@ export default {
   theme: {
     extend: {
       colors: {
+        theme: {
+          bg: 'var(--theme-bg)',
+          card: 'var(--theme-card)',
+          'card-hover': 'var(--theme-card-hover)',
+          surface: 'var(--theme-surface)',
+          border: 'var(--theme-border)',
+          'border-light': 'var(--theme-border-light)',
+          primary: 'var(--theme-text-primary)',
+          secondary: 'var(--theme-text-secondary)',
+          muted: 'var(--theme-text-muted)',
+          accent: 'var(--theme-accent)',
+          'accent-bg': 'var(--theme-accent-bg)',
+          nav: 'var(--theme-nav)',
+          input: 'var(--theme-input-bg)',
+        },
         quran: {
           dark: '#070b13',
           navy: '#0b1325',

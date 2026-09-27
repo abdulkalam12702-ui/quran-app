@@ -1,14 +1,26 @@
 import React, { createContext, useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { SURAHS_DATA, getSurahById } from '../data/surahsData';
 import { RECITERS_DATA, getReciterById, getSurahAudioUrl } from '../data/recitersData';
-import { BACKGROUND_VISUALS } from '../data/backgroundVisualsData';
+import { 
+  ENVIRONMENTS, 
+  getEnvironmentById, 
+  ENVIRONMENT_AMBIENT_MAP,
+  BACKGROUND_VISUALS 
+} from '../data/backgroundVisualsData';
 import { ambientSoundEngine } from '../services/ambientAudioEngine';
 import { usePreferences } from './PreferencesContext';
 
 const AudioContext = createContext();
 
 export const AudioProvider = ({ children }) => {
-  const { defaultReciterId, recordPlayHistory } = usePreferences();
+  const { 
+    defaultReciterId, 
+    recordPlayHistory,
+    savedEnvironmentId,
+    setSavedEnvironmentId,
+    isAutoBackground,
+    setIsAutoBackground,
+  } = usePreferences();
 
   // Active track state
   const [currentSurahId, setCurrentSurahId] = useState(1);
@@ -17,6 +29,13 @@ export const AudioProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Sync with default reciter when changed in Settings
+  useEffect(() => {
+    if (defaultReciterId && !isPlaying) {
+      setCurrentReciterId(defaultReciterId);
+    }
+  }, [defaultReciterId, isPlaying]);
   
   // Progress & Duration
   const [currentTime, setCurrentTime] = useState(0);
@@ -26,19 +45,22 @@ export const AudioProvider = ({ children }) => {
   // Playback settings
   const [playbackRate, setPlaybackRate] = useState(1.0);
   const [repeatMode, setRepeatMode] = useState('off'); // 'off', 'one', 'all'
-  const [autoPlayNext, setAutoPlayNext] = useState(true);
+  const [autoPlayNext, setAutoPlayNext] = useState(false);
 
   // Separate Audio Controls: Quran vs Ambient Background
   const [quranVolume, setQuranVolumeState] = useState(1.0);
   const [isQuranMuted, setIsQuranMuted] = useState(false);
 
-  const [ambientSound, setAmbientSoundState] = useState('rain'); // 'none', 'rain', 'ocean', 'wind', 'stream', 'pad'
-  const [ambientVolume, setAmbientVolumeState] = useState(0.2);
+  // Environment & Ambient Soundscape
+  const [activeEnvironmentId, setActiveEnvironmentId] = useState(savedEnvironmentId || 'mountains');
+  const [ambientSound, setAmbientSoundState] = useState(() => {
+    return ENVIRONMENT_AMBIENT_MAP[savedEnvironmentId || 'mountains'] || 'wind';
+  });
+  const [ambientVolume, setAmbientVolumeState] = useState(0.25);
   const [isAmbientMuted, setIsAmbientMuted] = useState(false);
 
   // UI States
   const [isFullScreenOpen, setIsFullScreenOpen] = useState(false);
-  const [activeVisualId, setActiveVisualId] = useState(BACKGROUND_VISUALS[0].id);
   const [sleepTimerRemaining, setSleepTimerRemaining] = useState(null); // in seconds
 
   // Audio elements & timers
@@ -48,7 +70,7 @@ export const AudioProvider = ({ children }) => {
 
   const currentSurah = getSurahById(currentSurahId);
   const currentReciter = getReciterById(currentReciterId);
-  const activeVisual = BACKGROUND_VISUALS.find(v => v.id === activeVisualId) || BACKGROUND_VISUALS[0];
+  const activeEnvironment = getEnvironmentById(activeEnvironmentId);
 
   // Set Quran recitation volume
   const setQuranVolume = (val) => {
@@ -94,6 +116,34 @@ export const AudioProvider = ({ children }) => {
     });
   };
 
+  // Environment Selector with optional ambient sound matching
+  const setEnvironment = useCallback((envId, syncAmbient = true) => {
+    setActiveEnvironmentId(envId);
+    setSavedEnvironmentId(envId);
+
+    if (syncAmbient && !isAmbientMuted && ambientSound !== 'none') {
+      const matchingAmbient = ENVIRONMENT_AMBIENT_MAP[envId] || 'wind';
+      setAmbientSoundState(matchingAmbient);
+      if (isPlaying) {
+        ambientSoundEngine.play(matchingAmbient);
+        ambientSoundEngine.setVolume(ambientVolume);
+      }
+    }
+  }, [ambientSound, ambientVolume, isAmbientMuted, isPlaying, setSavedEnvironmentId]);
+
+  // Toggle Auto Background Cycle
+  const toggleAutoBackground = useCallback(() => {
+    setIsAutoBackground(prev => !prev);
+  }, [setIsAutoBackground]);
+
+  // Cycle to next environment (for Auto Background)
+  const cycleNextEnvironment = useCallback(() => {
+    const idx = ENVIRONMENTS.findIndex(e => e.id === activeEnvironmentId);
+    const nextIdx = (idx + 1) % ENVIRONMENTS.length;
+    const nextEnvId = ENVIRONMENTS[nextIdx].id;
+    setEnvironment(nextEnvId, true);
+  }, [activeEnvironmentId, setEnvironment]);
+
   // Skip time (+10s, -10s)
   const skipTime = (deltaSeconds) => {
     if (!audioElementRef.current || !duration) return;
@@ -110,26 +160,59 @@ export const AudioProvider = ({ children }) => {
     setCurrentTime(target);
   };
 
-  // Play Next Surah
-  const playNext = useCallback(() => {
-    const nextId = currentSurahId < 114 ? currentSurahId + 1 : 1;
-    playSurah(nextId, currentReciterId);
-  }, [currentSurahId, currentReciterId]);
-
-  // Play Previous Surah
-  const playPrevious = useCallback(() => {
-    // If more than 3 seconds in, restart current track
-    if (currentTime > 3) {
-      seek(0);
-      return;
+  // Completely stop playback and reset position to 00:00
+  const stopAudio = useCallback(() => {
+    const audio = audioElementRef.current;
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
     }
-    const prevId = currentSurahId > 1 ? currentSurahId - 1 : 114;
-    playSurah(prevId, currentReciterId);
-  }, [currentSurahId, currentReciterId, currentTime]);
+    setIsPlaying(false);
+    setIsLoading(false);
+    setCurrentTime(0);
+    ambientSoundEngine.stopCurrent();
+  }, []);
 
-  // Play a specific Surah
-  const playSurah = (surahId, reciterId = currentReciterId) => {
+  // Select a Surah without starting playback (stops previous audio cleanly)
+  const selectSurah = useCallback((surahId, reciterId = currentReciterId) => {
     const sId = Number(surahId);
+    const audio = audioElementRef.current;
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+    ambientSoundEngine.stopCurrent();
+    setIsPlaying(false);
+    setIsLoading(false);
+    setCurrentTime(0);
+    setDuration(0);
+    setHasError(false);
+    setErrorMessage('');
+
+    setCurrentSurahId(sId);
+    setCurrentReciterId(reciterId);
+
+    const reciter = getReciterById(reciterId);
+    const { primaryUrl } = getSurahAudioUrl(reciter, sId);
+    if (audio) {
+      audio.src = primaryUrl;
+    }
+  }, [currentReciterId]);
+
+  // Play a specific Surah (stops any existing audio first to guarantee only one plays)
+  const playSurah = useCallback((surahId, reciterId = currentReciterId) => {
+    const sId = Number(surahId);
+
+    // 1. Cleanly stop any existing playback before starting new one
+    const audio = audioElementRef.current;
+    if (audio) {
+      audio.pause();
+      audio.currentTime = 0;
+    }
+    ambientSoundEngine.stopCurrent();
+    setIsPlaying(false);
+    setCurrentTime(0);
+
     setCurrentSurahId(sId);
     setCurrentReciterId(reciterId);
     setHasError(false);
@@ -137,10 +220,14 @@ export const AudioProvider = ({ children }) => {
     setIsLoading(true);
     fallbackTriedRef.current = false;
 
+    // If Auto Background is enabled, cycle environment on new Surah
+    if (isAutoBackground && sId !== currentSurahId) {
+      cycleNextEnvironment();
+    }
+
     const reciter = getReciterById(reciterId);
     const { primaryUrl } = getSurahAudioUrl(reciter, sId);
 
-    const audio = audioElementRef.current;
     audio.src = primaryUrl;
     audio.playbackRate = playbackRate;
     audio.volume = isQuranMuted ? 0 : quranVolume;
@@ -159,14 +246,31 @@ export const AudioProvider = ({ children }) => {
           }
         })
         .catch((err) => {
-          console.warn("Audio autoplay / play interrupted:", err);
-          // May be autoplay policy or load error
+          console.warn("Audio play interrupted:", err);
           setIsLoading(false);
+          setIsPlaying(false);
         });
     }
-  };
+  }, [currentReciterId, currentSurahId, isAutoBackground, cycleNextEnvironment, playbackRate, isQuranMuted, quranVolume, recordPlayHistory, ambientSound, isAmbientMuted, ambientVolume]);
 
-  // Toggle Play / Pause
+  // Play Next Surah (explicit user action)
+  const playNext = useCallback(() => {
+    const nextId = currentSurahId < 114 ? currentSurahId + 1 : 1;
+    playSurah(nextId, currentReciterId);
+  }, [currentSurahId, currentReciterId, playSurah]);
+
+  // Play Previous Surah (explicit user action)
+  const playPrevious = useCallback(() => {
+    // If more than 3 seconds in, restart current track
+    if (currentTime > 3) {
+      seek(0);
+      return;
+    }
+    const prevId = currentSurahId > 1 ? currentSurahId - 1 : 114;
+    playSurah(prevId, currentReciterId);
+  }, [currentSurahId, currentReciterId, currentTime, playSurah]);
+
+  // Toggle Play / Pause: pauses immediately and remembers position, resumes from paused position
   const togglePlayPause = () => {
     const audio = audioElementRef.current;
     if (!audio.src) {
@@ -175,16 +279,17 @@ export const AudioProvider = ({ children }) => {
     }
 
     if (isPlaying) {
+      // Pause immediately and keep currentTime position intact
       audio.pause();
       setIsPlaying(false);
       ambientSoundEngine.pause();
     } else {
+      // Resume from saved position
       setIsLoading(true);
       const playPromise = audio.play();
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
-            setIsPlaying(false); // will be updated by 'play' event
             setIsPlaying(true);
             setIsLoading(false);
             if (ambientSound !== 'none' && !isAmbientMuted) {
@@ -192,8 +297,9 @@ export const AudioProvider = ({ children }) => {
             }
           })
           .catch((err) => {
-            console.error("Playback error:", err);
+            console.error("Playback resume error:", err);
             setIsLoading(false);
+            setIsPlaying(false);
           });
       }
     }
@@ -221,12 +327,7 @@ export const AudioProvider = ({ children }) => {
         clearInterval(sleepTimerRef.current);
         sleepTimerRef.current = null;
         setSleepTimerRemaining(null);
-        // Pause playback gently
-        if (audioElementRef.current) {
-          audioElementRef.current.pause();
-        }
-        setIsPlaying(false);
-        ambientSoundEngine.stopCurrent();
+        stopAudio();
       }
     }, 1000);
   };
@@ -270,21 +371,24 @@ export const AudioProvider = ({ children }) => {
       ambientSoundEngine.pause();
     };
 
+    // When audio finishes: STOP COMPLETELY, reset to beginning, remain stopped.
+    // Do NOT automatically start another verse or surah.
     const handleEnded = () => {
       if (repeatMode === 'one') {
         audio.currentTime = 0;
-        audio.play();
-      } else if (repeatMode === 'all' || autoPlayNext) {
-        playNext();
+        audio.play().catch(() => {});
       } else {
+        audio.pause();
+        audio.currentTime = 0;
         setIsPlaying(false);
+        setIsLoading(false);
+        setCurrentTime(0);
         ambientSoundEngine.stopCurrent();
       }
     };
 
     const handleError = (e) => {
       console.warn("Audio playback error encountered on primary URL:", audio.src, e);
-      // Try fallback URL if primary fails
       if (!fallbackTriedRef.current) {
         fallbackTriedRef.current = true;
         const reciter = getReciterById(currentReciterId);
@@ -327,7 +431,7 @@ export const AudioProvider = ({ children }) => {
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
     };
-  }, [currentSurahId, currentReciterId, repeatMode, autoPlayNext, ambientSound, ambientVolume, isAmbientMuted, playNext]);
+  }, [currentSurahId, currentReciterId, repeatMode, ambientSound, ambientVolume, isAmbientMuted]);
 
   // Update Playback Rate
   useEffect(() => {
@@ -365,6 +469,7 @@ export const AudioProvider = ({ children }) => {
         currentSurahId,
         currentReciter,
         currentReciterId,
+        setCurrentReciterId,
         isPlaying,
         isLoading,
         hasError,
@@ -388,14 +493,23 @@ export const AudioProvider = ({ children }) => {
         setAmbientVolume,
         isAmbientMuted,
         toggleMuteAmbient,
-        activeVisual,
-        activeVisualId,
-        setActiveVisualId,
+        activeEnvironment,
+        activeEnvironmentId,
+        setEnvironment,
+        isAutoBackground,
+        toggleAutoBackground,
+        cycleNextEnvironment,
+        // Legacy compatibility
+        activeVisual: activeEnvironment,
+        activeVisualId: activeEnvironmentId,
+        setActiveVisualId: setEnvironment,
         isFullScreenOpen,
         openFullScreen: () => setIsFullScreenOpen(true),
         closeFullScreen: () => setIsFullScreenOpen(false),
         playSurah,
+        selectSurah,
         togglePlayPause,
+        stopAudio,
         seek,
         skipTime,
         playNext,
